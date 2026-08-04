@@ -10,6 +10,8 @@
 | `./uninstall.sh --purge` | 删除 | 清空 | **删除** | **删除** | 保留 |
 | `./uninstall.sh --purge -y` | 同上，跳过确认 | | | | |
 
+> 「同级镜像包目录」**只在气隙安装存在**：自己用 `make package-images-amd64` 造出的 `agent-platform-images-<ver>-amd64/`，放在 `agent-platform-dc-standalone-<ver>/` 同级。`--purge` **不会**碰它 —— 这是部署资产，下次 `install.sh` 还会自动发现复用。
+
 ::: danger `--purge` 会删除 `.secrets_encryption_key`
 这是有意为之且具破坏性：丢失该文件后，`platform_secrets` 表里所有加密凭据（vCenter 口令、上游 API Key 等）都将**无法解密**。数据库还在，但里面的密钥全部报废。
 
@@ -20,7 +22,7 @@
 
 - 数据卷存在 docker 的命名卷里，**不在安装目录下**。`uninstall.sh` 会带 `--volumes` 执行 `docker compose down`，所以会被清掉。
 - 如果你把 `pg_data` 改成了宿主机 bind mount，需要手工 `rm -rf` —— `--purge` 不会动宿主 bind mount。
-- 同级的 `agent-platform-images-*/` 是运维的部署资产，`--purge` **不会**删它，留着下次 `install.sh` 直接复用。
+- 同级镜像包目录（如果你走气隙安装）不会被 `--purge` 删，留着下次 `install.sh` 直接复用。
 
 ```bash
 docker volume ls | grep agent-platform
@@ -87,12 +89,23 @@ chmod 600 "$BK"/.env "$BK"/.secrets_encryption_key
 ```bash
 # 在 .env 里 pin 新 tag，例如：
 # BACKEND_IMAGE=agent-platform-backend:v0.0.2
+# CONSOLE_IMAGE=agent-platform-console:v0.0.2
 docker compose -p agent-platform pull
 docker compose -p agent-platform up -d
 ./verify.sh
 ```
 
-离线环境下先 `docker load` 新镜像包，再 `up -d`。
+**可选的标签**（以 `agent-platform-backend` / `agent-platform-console` 为例）：
+
+| 标签 | 含义 | 何时用 |
+|---|---|---|
+| `latest` | 流动指针，跟随每次 release 更新 | 默认；想跟最新时保留 |
+| `v0.0.1` / `v0.0.2` / ... | 与 release tarball 对齐的版本号 | 升级 / 锁版本到已知 release |
+| `v0.0.1-20260804` | 开发期日级构建（quay.io 上的 git describe tag） | 排障 / 复现某个 commit |
+
+完整列表见 [quay.io 仓库 tags 页](https://quay.io/repository/vmware-ai/agent-platform-backend?tab=tags)，release 列表见 [发布说明](/reference/releases)。
+
+离线（气隙）环境下，先在新版本 tarball 旁边重新 `make package-images-amd64` 出一份新镜像包、再 `docker load`，然后 `up -d`。
 
 ### 升级前的检查清单
 

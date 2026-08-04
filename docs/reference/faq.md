@@ -3,13 +3,16 @@
 ## 关于版本
 
 **Q：v0.0.1 包含哪些部署形态？**
-只发布 **docker-compose 单机（`dc-standalone`）** 与配套的 `linux/amd64` 离线镜像包。`dc-distribution`、`k8s-standalone`、`k8s-ha` 的脚手架已在仓库里，本次不发布。
+发布 **4 个形态**，每个是独立 tarball：`dc-standalone`（单机开发）、`dc-distribution`（本地多服务）、`k8s-standalone`（k8s 小集群）、`k8s-ha`（k8s 生产 HA）。k8s-* 形态自带完整 Helm chart（templates + values 文件）。
+
+**Q：v0.0.1 还有离线镜像包吗？**
+**没有了。** release 只发布 4 个安装 tarball，`install.sh` 默认从 `quay.io/vmware-ai/<image>` 拉镜像。需要完全离网时按 [离线安装（单机）](/install/dc-standalone#6-离线安装可选气隙环境) 在能上网的机器上 `make package-images-amd64`（或 `arm64`）自己造一份镜像包。
 
 **Q：支持 arm64 吗？**
-v0.0.1 只提供 amd64 离线镜像包。装在 aarch64 主机上 preflight 会告警，容器无法启动。
+支持 —— `install.sh` 自动按主机架构选镜像。如果走气隙安装，用 `make package-images-arm64` 出对应架构的镜像包就行。
 
 **Q：能装在 k8s 上吗？**
-本版本不行，等后续 minor 版本发布 Helm 形态。
+v0.0.1 已经可以。用 `agent-platform-k8s-standalone-<v>.tar.gz`（自带 PG/Redis）或 `agent-platform-k8s-ha-<v>.tar.gz`（需外部 PG/Redis），分别覆盖小集群与生产 HA 两个场景。
 
 **Q：单机形态能撑多少智能体？**
 控制面是单副本，主要瓶颈在数据库与请求日志摄入。评估阶段的经验值是几十台没问题；规模上量之后建议等 HA 形态。
@@ -17,7 +20,7 @@ v0.0.1 只提供 amd64 离线镜像包。装在 aarch64 主机上 preflight 会�
 ## 关于安装
 
 **Q：必须联网吗？**
-不必须。离线镜像包 + 自包含安装脚本可在完全离网的主机上安装。唯一必需的外部连接是**平台主机到 vCenter 的 443**，以及到内网模型服务。
+默认安装**需要**目标机能访问 `quay.io`（拉镜像）。完全离网 / 气隙环境用 [离线安装（单机）](/install/dc-standalone#6-离线安装可选气隙环境) —— 先在能上网的机器上造镜像包、再带到目标机作为同级目录放好。装好之后，唯一必需的外部连接是**平台主机到 vCenter 的 443**，以及到内网模型服务。
 
 **Q：`install.sh` 说 `EXTERNAL_IP` 非法？**
 必须填浏览器真正会输入的地址。不接受空值、`0.0.0.0`、`localhost`、`127.x.x.x`、`::1`。

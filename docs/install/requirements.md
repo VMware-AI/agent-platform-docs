@@ -1,17 +1,24 @@
 # 环境要求
 
-v0.0.1 发布 **docker-compose 单机形态（`dc-standalone`）**：整套控制面跑在一台 Linux 主机上，8 个容器由一份 compose 文件拉起，可在完全离网的环境中安装。
+v0.0.1 发布 **4 个安装包**（`dc-standalone` / `dc-distribution` / `k8s-standalone` / `k8s-ha`），各自的 `install.sh` 各自完成安装。本页以 `dc-standalone` 为主说明主机要求，其他形态的差异在对应章节补述。
+
+> **离线安装的语义变了**
+>
+> v0.0.1 **不再随 release 发布离线镜像包**。`install.sh` 默认直接从 `quay.io/vmware-ai/<image>` 拉取 —— 目标机需要能访问 `quay.io`。
+>
+> 完全离网 / 气隙环境请先用部署仓库的 `make package-images-amd64`（或 `package-images-arm64`）造一个同名同结构的镜像包，作为同级目录放好后 `install.sh` 会自动 `docker load`，网络要求归零。详见 [离线安装（单机）](/install/dc-standalone#离线安装可选气隙环境)。
 
 ## 平台主机
 
 | 项目 | 要求 |
 |---|---|
-| 操作系统 | Linux（x86_64 / amd64）。v0.0.1 只发布 `linux/amd64` 离线镜像包 |
+| 操作系统 | Linux（x86_64 / amd64 或 aarch64 / arm64）。`install.sh` 自动匹配主机架构 |
 | Docker | Docker Engine + **compose 插件**（`docker compose version` 可用，不是老的 `docker-compose`） |
 | 磁盘 | `/var` 至少 **5 GB** 空闲（preflight 会告警）；**建议 100 GB 以上** |
 | 内存 | 建议 8 GB 以上 |
 | CPU | 4 核以上 |
-| 网络 | 一张有固定 IP 的网卡；离线安装不需要任何出站网络 |
+| 网络（默认在线安装） | 一张有固定 IP 的网卡；**目标机需要能访问 `quay.io`** |
+| 网络（气隙安装） | 仅需访问平台主机自身的本地回环（`docker load` 走本地镜像包） |
 | 权限 | 能执行 docker 命令；使用 1024 以下端口需 root 或 `CAP_NET_BIND_SERVICE` |
 
 ### 容量规划
@@ -20,18 +27,37 @@ v0.0.1 发布 **docker-compose 单机形态（`dc-standalone`）**：整套控�
 
 | 项目 | 量级 |
 |---|---|
-| 离线镜像包解压 + `docker load` 后 | 约 5–8 GB |
+| 镜像（`docker load` 或 `docker pull` 后） | 约 5–8 GB |
 | PostgreSQL（平台元数据 + 网关账单） | 起步几百 MB，随请求日志与账单线性增长 |
 | Prometheus 时序 | 按抓取密度，月级几 GB |
 | Grafana / Redis | 很小 |
+
+### 镜像标签
+
+`install.sh` 默认从 `quay.io/vmware-ai/<image>` 拉**`latest` 标签**的镜像 —— `latest` 是流动指针，会随每次发布更新。如果要复现某个具体版本，把对应的 `*_IMAGE` 变量在 `.env` 里 pin 住即可：
+
+| 镜像 | 默认 | 可选 tag |
+|---|---|---|
+| `agent-platform-backend` | `latest` | `latest` / `v0.0.1` / `v0.0.1-YYYYMMDD` |
+| `agent-platform-console` | `latest` | `latest` / `v0.0.1` / `v0.0.1-YYYYMMDD` |
+| `litellm`（上游） | `v1.89.4` | 由 `litellm` 上游决定 |
+| `postgres` / `redis` / `prometheus` / `grafana` / `otel-collector` | 各自 pin 死 | 一般不用改 |
+
+```bash
+# 例：把 backend / console pin 到 v0.0.1（与 release tarball 同步的版本）
+echo 'BACKEND_IMAGE=agent-platform-backend:v0.0.1' >> .env
+echo 'CONSOLE_IMAGE=agent-platform-console:v0.0.1' >> .env
+./install.sh
+```
+
+`v0.0.1-YYYYMMDD` 是开发期的日级构建，仅在排障 / 验证某个具体 commit 时需要 —— 不在 release 列表里但 quay.io 上仍可拉到。
 
 ::: tip 请求日志是主要增长源
 调用量大的环境里，`agentplatform` 库的请求日志表增长最快。规划时按「每天多少次调用 × 保留多久」估算，并定期做归档导出（[审计日志](/observability/audit-log)与[请求日志](/observability/request-log)都支持 CSV 导出）。
 :::
 
 ::: warning 架构必须匹配
-离线镜像包按架构拆分。v0.0.1 只提供 `amd64`；装在 `aarch64` 主机上 preflight 会告警，且容器无法启动。
-:::
+`install.sh` / preflight 会检查主机架构并选择对应的镜像。如果用自造的镜像包，必须选跟主机架构一致的那个（amd64 ↔ `linux/amd64`、arm64 ↔ `linux/arm64`）。
 
 ### 装之前先自查
 
@@ -131,23 +157,43 @@ vLLM、SGLang、Xinference、Ollama 等基本都提供 OpenAI 兼容接口，选
 
 ## 交付物清单
 
-从 [release v0.0.1](https://github.com/VMware-AI/agent-platform-deployment/releases/tag/release-v0.0.1) 下载：
+::: tip v0.0.1 安装包
+[`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz) —— 自包含 tarball，自带 `SHA256SUMS`。
 
-| 文件 | 说明 |
-|---|---|
-| `agent-platform-dc-standalone-0.0.1.tar.gz` | 安装包（自包含：脚本 + compose + 配置 + 文档） |
-| `agent-platform-images-0.0.1-amd64.tar.gz` | 离线镜像包（amd64） |
-| `SHA256SUMS` | 校验和 |
+**v0.0.1 release 暂只发布 `dc-standalone` 这一个**。其他三个形态（`dc-distribution` / `k8s-standalone` / `k8s-ha`）的源码与 `make package-*` target 已在部署仓库就绪，但本 release 暂不出包，需要的话从源码 clone 后自行构建：
+
+```bash
+git clone https://github.com/VMware-AI/agent-platform-deployment.git
+cd agent-platform-deployment
+make package-dc-distribution   # 或 package-k8s-standalone / package-k8s-ha
+```
+
+详见 [release 页](https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1) 与 [部署仓库 README](https://github.com/VMware-AI/agent-platform-deployment/blob/main/README.md)。
+:::
+
+形态对照：
+
+| 形态 | 适用场景 | v0.0.1 是否有官方 tarball |
+|---|---|---|
+| `dc-standalone` | 单机开发 / 评估 / 单机生产 | ✅ 已在 release 发布 |
+| `dc-distribution` | 本地多服务开发（控制面 + 网关 DB 分离） | ⏳ 仓库已就绪，需自行 `make package-dc-distribution` |
+| `k8s-standalone` | k8s 小集群（自带 PG/Redis StatefulSet） | ⏳ 仓库已就绪，需自行 `make package-k8s-standalone` |
+| `k8s-ha` | k8s 生产 HA（外部 PG/Redis，≥2 副本） | ⏳ 仓库已就绪，需自行 `make package-k8s-ha` |
+
+::: tip 离线镜像包不再随 release 发布
+默认安装由 `install.sh` 从 `quay.io/vmware-ai/*` 拉镜像。**如果目标机无法访问 `quay.io`**，先在能访问的机器上从 `agent-platform-deployment` 仓库跑 `make package-images-amd64`（或 `package-images-arm64`），把产出的 `agent-platform-images-<ver>-amd64.tar.gz` 作为同级目录放到目标机后，`install.sh` 会自动走 `docker load`。
+:::
 
 ## 安装前检查清单
 
-- [ ] Linux x86_64 主机，`docker compose version` 可用
+- [ ] Linux 主机（amd64 或 arm64），`docker compose version` 可用
 - [ ] `/var` 空闲 ≥ 5 GB（建议 100 GB）
 - [ ] 确定了 `EXTERNAL_IP`（真实网卡 IP 或 DNS 名，不是 `127.0.0.1`）
 - [ ] 443 / 80 端口没被占用，防火墙已放行 443
+- [ ] 目标机到 `quay.io` 443 通（默认安装）；或离线镜像包已同级备好（气隙安装）
 - [ ] 拿到 vCenter 地址与专用账号，权限按上表配好
 - [ ] 内容库里已导入智能体 OVA 模板
 - [ ] 准备好至少一个上游模型的 API Base + API Key + 单价
-- [ ] 两个 tarball 已下载并校验 SHA256
+- [ ] 安装包已下载并校验 SHA256
 
 齐了就可以开始 → [离线安装（单机）](/install/dc-standalone)
