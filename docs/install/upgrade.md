@@ -89,10 +89,21 @@ chmod 600 "$BK"/.env "$BK"/.secrets_encryption_key
 ```bash
 # 在 .env 里 pin 新 tag，例如：
 # BACKEND_IMAGE=agent-platform-backend:v0.0.2
+# CONSOLE_IMAGE=agent-platform-console:v0.0.2
 docker compose -p agent-platform pull
 docker compose -p agent-platform up -d
 ./verify.sh
 ```
+
+**可选的标签**（以 `agent-platform-backend` / `agent-platform-console` 为例）：
+
+| 标签 | 含义 | 何时用 |
+|---|---|---|
+| `latest` | 流动指针，跟随每次 release 更新 | 默认；想跟最新时保留 |
+| `v0.0.1` / `v0.0.2` / ... | 与 release tarball 对齐的版本号 | 升级 / 锁版本到已知 release |
+| `v0.0.1-20260804` | 开发期日级构建（quay.io 上的 git describe tag） | 排障 / 复现某个 commit |
+
+完整列表见 [quay.io 仓库 tags 页](https://quay.io/repository/vmware-ai/agent-platform-backend?tab=tags)，release 列表见 [发布说明](/reference/releases)。
 
 离线（气隙）环境下，先在新版本 tarball 旁边重新 `make package-images-amd64` 出一份新镜像包、再 `docker load`，然后 `up -d`。
 

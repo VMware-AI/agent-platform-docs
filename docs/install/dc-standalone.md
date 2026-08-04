@@ -101,6 +101,30 @@ ADMIN_BOOTSTRAP_PASSWORD=<你自己的强口令>
 跑 `./install.sh up --dry-run`（如果该版本支持）或者直接 `bash -x ./install.sh up` 看 trace —— 所有密钥生成、证书签发、镜像加载、compose up 都是带日志的步骤，定位哪一步出错很方便。
 :::
 
+### 镜像标签
+
+`install.sh` 默认拉 **`:latest`** 标签的镜像（`latest` 是流动指针，跟着 release 更新）。要复现某个具体版本，把对应的 `*_IMAGE` 变量在 `.env` 里 pin 住再跑 `./install.sh`：
+
+```bash
+# 默认（跟随最新）：什么都不写
+BACKEND_IMAGE=agent-platform-backend:latest
+CONSOLE_IMAGE=agent-platform-console:latest
+
+# Pin 到与 v0.0.1 tarball 对齐的版本
+BACKEND_IMAGE=agent-platform-backend:v0.0.1
+CONSOLE_IMAGE=agent-platform-console:v0.0.1
+
+# 开发期日级构建（v0.0.1-20260804 之类），排障 / 复现某个 commit 时用
+BACKEND_IMAGE=agent-platform-backend:v0.0.1-20260804
+CONSOLE_IMAGE=agent-platform-console:v0.0.1-20260804
+```
+
+可用的标签见 [quay.io/vmware-ai/agent-platform-backend](https://quay.io/repository/vmware-ai/agent-platform-backend?tab=tags) / [agent-platform-console](https://quay.io/repository/vmware-ai/agent-platform-console?tab=tags)。release 列表见 [发布说明](/reference/releases)。
+
+::: tip 默认行为 + 可控性
+默认 `:latest` 的好处是新装直接拿到最新；缺点是「今天装」和「明天装」拿到的可能不是同一份二进制。**生产环境首次装完建议立刻 pin 到当时的版本号**，避免后续 `docker compose pull` 把整个堆栈滚动升级到未验证的新版本。需要升级时按 [升级与卸载](/install/upgrade#只换镜像-tag) 走。
+:::
+
 ## 4. 读安装横幅
 
 脚本结尾会打印一段 banner，其中这几行最重要：

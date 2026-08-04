@@ -32,6 +32,26 @@ v0.0.1 发布 **4 个安装包**（`dc-standalone` / `dc-distribution` / `k8s-st
 | Prometheus 时序 | 按抓取密度，月级几 GB |
 | Grafana / Redis | 很小 |
 
+### 镜像标签
+
+`install.sh` 默认从 `quay.io/vmware-ai/<image>` 拉**`latest` 标签**的镜像 —— `latest` 是流动指针，会随每次发布更新。如果要复现某个具体版本，把对应的 `*_IMAGE` 变量在 `.env` 里 pin 住即可：
+
+| 镜像 | 默认 | 可选 tag |
+|---|---|---|
+| `agent-platform-backend` | `latest` | `latest` / `v0.0.1` / `v0.0.1-YYYYMMDD` |
+| `agent-platform-console` | `latest` | `latest` / `v0.0.1` / `v0.0.1-YYYYMMDD` |
+| `litellm`（上游） | `v1.89.4` | 由 `litellm` 上游决定 |
+| `postgres` / `redis` / `prometheus` / `grafana` / `otel-collector` | 各自 pin 死 | 一般不用改 |
+
+```bash
+# 例：把 backend / console pin 到 v0.0.1（与 release tarball 同步的版本）
+echo 'BACKEND_IMAGE=agent-platform-backend:v0.0.1' >> .env
+echo 'CONSOLE_IMAGE=agent-platform-console:v0.0.1' >> .env
+./install.sh
+```
+
+`v0.0.1-YYYYMMDD` 是开发期的日级构建，仅在排障 / 验证某个具体 commit 时需要 —— 不在 release 列表里但 quay.io 上仍可拉到。
+
 ::: tip 请求日志是主要增长源
 调用量大的环境里，`agentplatform` 库的请求日志表增长最快。规划时按「每天多少次调用 × 保留多久」估算，并定期做归档导出（[审计日志](/observability/audit-log)与[请求日志](/observability/request-log)都支持 CSV 导出）。
 :::
