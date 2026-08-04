@@ -95,7 +95,7 @@ deploy/
 ├── build.yml                    # 每次 push/PR 构建并上传 docs-dist 制品
 ├── release.yml                  # 打 v* tag → 出离线包 → 挂到 GitHub Release
 ├── pages.yml                    # 可选：发布到 GitHub Pages
-└── image.yml                    # 打 v* tag → 构建镜像 → 推到 GHCR
+└── image.yml                    # 打 v* tag → 构建镜像 → 推到 quay.io
 ```
 
 ## 离线发布包
