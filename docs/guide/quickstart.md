@@ -7,10 +7,10 @@
 ::: tip 需要准备的四样东西
 | | 说明 |
 |---|---|
-| **一台 Linux 主机** | 已装 Docker + compose 插件，`/var` ≥ 5 GB 空闲，有固定 IP。详见[环境要求](/install/requirements) |
+| **一台 Linux 主机** | 已装 Docker + compose 插件，`/var` ≥ 5 GB 空闲，有固定 IP，能访问 `quay.io`（默认安装）。详见[环境要求](/install/requirements) |
 | **一套 vCenter** | 地址 + 账号，账号需要克隆 VM、改 vApp 属性、开关机的权限 |
 | **一个可用的上游模型** | API Base + API Key（内网私有模型服务也行） |
-| **v0.0.1 的两个 tarball** | 安装包 + amd64 离线镜像包 |
+| **v0.0.1 的安装 tarball** | `agent-platform-dc-standalone-0.0.1.tar.gz`（如果完全离网，再加一个自造镜像包，见下文） |
 :::
 
 ## 一、装平台（约 3 分钟）
@@ -18,8 +18,6 @@
 ```bash
 mkdir -p /opt/agent-platform && cd /opt/agent-platform
 
-# 两个 tarball 解到同级目录
-tar -xzf /path/to/agent-platform-images-0.0.1-amd64.tar.gz
 tar -xzf /path/to/agent-platform-dc-standalone-0.0.1.tar.gz
 
 cd agent-platform-dc-standalone-0.0.1
@@ -39,9 +37,11 @@ ADMIN_BOOTSTRAP_PASSWORD=<强口令>    # 默认值是 ChangeMe123!，务必改�
 ./install.sh
 ```
 
-脚本自动生成所有密钥、自签 TLS 证书、加载离线镜像、拉起 8 个容器，最后跑一次 smoke test。**全程 60–120 秒。**
+脚本自动生成所有密钥、自签 TLS 证书、从 `quay.io/vmware-ai/<image>` 拉取镜像、拉起 8 个容器，最后跑一次 smoke test。**全程 60–120 秒。**
 
-→ 细节见[离线安装（单机）](/install/dc-standalone)
+> 目标机无法访问 `quay.io`？在能上网的机器上跑 `make package-images-amd64` 造一个镜像包，作为同级目录放好，`install.sh` 会自动 `docker load` 而不联网拉。详见[离线安装（单机）](/install/dc-standalone#6-离线安装可选气隙环境)。
+
+→ 细节见[安装单机形态（dc-standalone）](/install/dc-standalone)
 
 ## 二、首次登录（约 2 分钟）
 

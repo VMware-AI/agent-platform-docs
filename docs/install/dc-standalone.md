@@ -1,29 +1,30 @@
-# 离线安装（单机）
+# 安装单机形态（dc-standalone）
 
-`dc-standalone` 是 v0.0.1 发布的形态：一台主机、8 个容器、完全离网可装。
+`dc-standalone` 是 v0.0.1 发布的入门形态：一台主机、一份 compose、`./install.sh` 拉起整套控制面。本页覆盖从 tarball 安装、`.env` 配置、到气隙环境离线安装与开发模式的所有路径。
+
+> v0.0.1 同时发布另外 3 个形态：`dc-distribution`（多服务开发）、`k8s-standalone`（k8s 小集群）、`k8s-ha`（k8s 生产 HA）。它们的安装方式与本页 90% 相同（`install.sh` 同款行为），差异只在形态专属的 `manifest.yaml` / `.env.example` 与 Helm chart overlay。本手册后续会补对应章节，目前请参考 [部署仓库 README](https://github.com/VMware-AI/agent-platform-deployment/blob/main/README.md)。
+
+> **v0.0.1 的离线语义变了**
+>
+> release **不再带离线镜像包**。`install.sh` 默认从 `quay.io/vmware-ai/<image>` 拉取 —— 目标机需要能访问 `quay.io`。
+>
+> 完全离网 / 气隙环境按本文 [§6 离线安装（可选：气隙环境）](#6-离线安装可选气隙环境) 走 —— 先在能上网的机器上用 `make package-images-amd64` 造一个镜像包，再带到目标机作为同级目录放好。
 
 ## 1. 落盘
-
-把**两个 tarball 解压到同级目录** —— 安装脚本按相对路径 `../agent-platform-images-*/images/images.tar.gz` 找镜像包。
 
 ```bash
 mkdir -p /opt/agent-platform && cd /opt/agent-platform
 
-tar -xzf /path/to/agent-platform-images-0.0.1-amd64.tar.gz
 tar -xzf /path/to/agent-platform-dc-standalone-0.0.1.tar.gz
 
 ls
-# agent-platform-images-0.0.1-amd64/
 # agent-platform-dc-standalone-0.0.1/
 ```
-
-::: warning 两个包必须是同级目录
-不是「镜像包放进安装包里」，而是**并排**。放错位置时 `install.sh` 会找不到镜像包，可以用 `--images=<path>` 显式指定。
-:::
 
 安装前建议校验：
 
 ```bash
+cd agent-platform-dc-standalone-0.0.1
 sha256sum -c SHA256SUMS
 ```
 
@@ -70,7 +71,7 @@ ADMIN_BOOTSTRAP_PASSWORD=<你自己的强口令>
 <li><strong>自举 TLS</strong> —— <code>SSL_CERT_PATH</code> / <code>SSL_KEY_PATH</code> 指向的证书不存在时，生成 365 天自签证书，SAN 含 <code>EXTERNAL_IP</code>、<code>127.0.0.1</code>、<code>localhost</code>。已放置自有证书则原样复用。</li>
 <li><strong>维护 <code>ALLOWED_ORIGINS</code></strong> —— 空值时设为 <code>https://${EXTERNAL_IP}</code>；非空但缺该 URL 则追加。<strong>不要手工编辑这一项。</strong></li>
 <li><strong>preflight</strong> —— 检查 docker、compose 插件、架构、磁盘空间。</li>
-<li><strong>加载离线镜像</strong> —— 先按 <code>SHA256SUMS</code> 校验镜像包，再 <code>docker load</code>。（源码树模式则走 <code>docker compose pull</code>。）</li>
+<li><strong>获取镜像</strong> —— 优先扫描同级 <code>agent-platform-images-*/images/images.tar.gz</code>，找到则按 <code>SHA256SUMS</code> 校验后 <code>docker load</code>；否则 <code>docker compose pull</code> 从 <code>quay.io/vmware-ai/&lt;image&gt;</code> 拉取（需能访问 <code>quay.io</code>）。<code>--skip-image-load</code> 可跳过整个步骤。</li>
 <li><strong>渲染 <code>prometheus.yml</code></strong> —— 把 <code>LITELLM_MASTER_KEY</code> 代入 Bearer 凭据，使 prometheus 能抓 litellm 的 <code>/metrics</code>。每次安装都重新渲染，密钥轮换后自动生效。</li>
 <li><strong>渲染 OTel collector 配置</strong> —— 供请求日志采集使用。</li>
 <li><strong>拉起容器</strong> —— <code>docker compose -p agent-platform up -d</code>。</li>
@@ -84,11 +85,16 @@ ADMIN_BOOTSTRAP_PASSWORD=<你自己的强口令>
 | 参数 | 说明 |
 |---|---|
 | `--env-file=<path>` | 指定 env 文件（默认找 `./.env`） |
-| `--images=<path>` | 指定离线镜像包路径（默认 `../agent-platform-images-*/images/images.tar.gz`） |
-| `--skip-image-load` | 跳过 `docker load`（镜像已在本机时用） |
+| `--images=<path>` | 指定离线镜像包路径（默认扫描同级目录 `../agent-platform-images-*/images/images.tar.gz`，找不到则从 `quay.io` 拉） |
+| `--skip-image-load` | 跳过镜像获取步骤（镜像已在本地、且不打算让脚本拉任何东西时用） |
+| `--namespace=<name>` | 仅 k8s-* 形态生效（默认 `agent-platform`），dc-* 忽略 |
 
 ::: tip 重复执行是安全的
 `install.sh` 设计成可反复执行：已生成的密钥不会被覆盖、已有的证书不会被替换、容器会被 `up -d` 平滑重建。改完 `.env` 之后直接再跑一次就是「应用改动」。
+:::
+
+::: tip 想看 `install.sh` 干了哪些步骤
+跑 `./install.sh up --dry-run`（如果该版本支持）或者直接 `bash -x ./install.sh up` 看 trace —— 所有密钥生成、证书签发、镜像加载、compose up 都是带日志的步骤，定位哪一步出错很方便。
 :::
 
 ## 4. 读安装横幅
@@ -134,9 +140,65 @@ banner 同时会打印：
 
 各档位差异见[升级与卸载](/install/upgrade#停--卸载各档位的差异)。
 
-## 6. 从源码树安装（在线）
+## 6. 离线安装（可选：气隙环境）
 
-有出口网络时也可以直接从仓库跑：
+只给**目标机完全无法访问 `quay.io`**的场景用。多一步「在能上网的机器上造镜像包」，传到目标机后 `install.sh` 会自动 `docker load`。
+
+### 步骤 1：在能访问 `quay.io` 的机器上造镜像包
+
+```bash
+git clone https://github.com/VMware-AI/agent-platform-deployment.git
+cd agent-platform-deployment
+
+# 按目标机的 CPU 架构选 amd64 / arm64
+case "$(uname -m)" in
+  x86_64)  make package-images-amd64 ;;
+  aarch64|arm64) make package-images-arm64 ;;
+  *) echo "unknown arch" >&2; exit 1 ;;
+esac
+
+# 产物在 dist/ 下，名字形如 agent-platform-images-<ver>-amd64.tar.gz
+ls -lh dist/
+```
+
+输出包含 `manifest.yaml` + `images/images.tar.gz` + `images/SHA256SUMS`，与镜像的源清单 [`origin-images-list.txt`](https://github.com/VMware-AI/agent-platform-deployment/blob/main/origin-images-list.txt) 对得上。**升级时 bump 这两个清单再重新打包**。
+
+### 步骤 2：把两个 tarball 一起搬到目标机
+
+```bash
+# 在目标机上 —— 镜像包作为安装包的同级目录放好
+mkdir -p /opt/agent-platform && cd /opt/agent-platform
+
+tar -xzf agent-platform-images-<ver>-amd64.tar.gz     # → ./agent-platform-images-<ver>-amd64/
+tar -xzf agent-platform-dc-standalone-<ver>.tar.gz   # → ./agent-platform-dc-standalone-<ver>/
+```
+
+### 步骤 3：照常 `install.sh`
+
+```bash
+cd agent-platform-dc-standalone-<ver>
+cp .env.example .env
+$EDITOR .env      # 必须填 EXTERNAL_IP
+./install.sh
+```
+
+`install.sh` 会扫描同级目录下的 `agent-platform-images-*/images/images.tar.gz`，找到就走 `docker load`，找不到才退化到 `docker compose pull`（也就是需要访问 `quay.io`）。
+
+::: tip 自动发现不命中时手动指
+目录名 / 布局跟约定对不上时（比如你把镜像包换了个名字），用 `--images=<path>` 显式指给 `install.sh`：
+
+```bash
+./install.sh --images=/srv/images/my-bundle/images.tar.gz
+```
+:::
+
+::: tip 不想要自动扫描的语义
+完全跳过镜像获取步骤（包括 `docker load` 和 `docker compose pull`）：`--skip-image-load`。用于镜像已经在本机、并且想用其他方式管理（自己 `docker load` / 用 `nerdctl` / 用 k8s 节点池导入）的场景。
+:::
+
+## 7. 从源码树安装（开发 / 评估）
+
+只给开发或评估用：从仓库 clone 后直接跑 `install.sh`，效果跟 tarball 一致，但改动会被立刻跟进。
 
 ```bash
 git clone https://github.com/VMware-AI/agent-platform-deployment.git
@@ -144,13 +206,13 @@ cd agent-platform-deployment/docker-compose/standalone
 ./install.sh
 ```
 
-`install.sh` 自动识别布局，改走 `docker compose pull` 从镜像仓库拉取（需能访问 `quay.io/vmware-ai/*`），其余流程与离线安装一致。
+`install.sh` 检测到当前在源码树里、改走 `docker compose pull` 从 `quay.io/vmware-ai/<image>` 拉镜像（需能访问 `quay.io`），其余流程（密钥生成、TLS 自举、preflight、冒烟测试）跟 tarball 完全一样。
 
-| | 离线（tarball） | 在线（源码树） |
+| | tarball 安装 | 源码树安装 |
 |---|---|---|
-| 镜像来源 | `docker load` 本地包 | `docker compose pull` |
-| 网络要求 | 无 | 能访问 quay.io |
-| 适用 | 生产、气隙环境 | 开发、评估 |
+| 镜像来源 | 默认 `docker compose pull`；同级有 `agent-platform-images-*/` 则 `docker load` | `docker compose pull`（镜像源从仓库 `manifest.yaml` 读） |
+| 网络要求 | 能访问 `quay.io`；气隙则需要同级镜像包 | 能访问 `quay.io` |
+| 适用 | 生产、评估、CI | 改镜像 / 改 compose / 改脚本的开发 |
 
 ## 安装完成后的目录
 

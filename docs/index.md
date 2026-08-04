@@ -37,9 +37,9 @@ features:
     linkText: 可观测性
   - icon: 🔒
     title: 完全离网可运行
-    details: 离线镜像包 + 自包含安装脚本，目标主机无需访问任何镜像仓库；密钥本地加密入库，数据不出企业边界。
+    details: 默认从 quay.io 拉镜像，需要时可用部署仓库的 make package-images-* 自造离线镜像包；密钥本地加密入库，数据不出企业边界。
     link: /install/dc-standalone
-    linkText: 离线安装
+    linkText: 安装方式
 ---
 
 <div class="ap-section">
@@ -83,14 +83,17 @@ features:
 
 ## v0.0.1 —— 首个正式可用版本
 
-<p class="ap-lead">本版本发布 <strong>docker-compose 单机（dc-standalone）</strong> 形态与配套的 linux/amd64 离线镜像包。两个 tarball 解到同级目录，执行 <code>./install.sh</code>，整套系统即可在完全离网的环境里跑起来。</p>
+<p class="ap-lead">本版本发布 <strong>4 个形态</strong>的安装包，分别面向单机开发、本地多服务、k8s 小集群、生产 HA 场景。解压对应的 tarball → 写 <code>.env</code> → <code>./install.sh</code> 即可。</p>
+
+<p class="ap-lead">v0.0.1 <strong>不再随 release 发布离线镜像包</strong>。<code>install.sh</code> 默认直接从 <code>quay.io/vmware-ai/&lt;image&gt;</code> 拉取镜像 —— 目标机需要能访问 <code>quay.io</code>。需要完全离网安装时，从部署仓库用 <code>make package-images-amd64</code> 自己造一个同名同结构的镜像包（见<a href="/install/dc-standalone">离线安装</a>）。</p>
 
 | 内容 | 说明 |
 |---|---|
-| 安装包 | [`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/release-v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz) |
-| 镜像包 | `agent-platform-images-0.0.1-amd64.tar.gz`（随 release 发布） |
-| 校验 | `SHA256SUMS`（发布页同目录） |
-| 其他形态 | `dc-distribution` / `k8s-standalone` / `k8s-ha` 脚手架已就绪，本次不发布 |
+| 安装包 · dc-standalone | [`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/release-v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz) |
+| 安装包 · dc-distribution | `agent-platform-dc-distribution-0.0.1.tar.gz` |
+| 安装包 · k8s-standalone | `agent-platform-k8s-standalone-0.0.1.tar.gz`（Helm chart 自包含） |
+| 安装包 · k8s-ha | `agent-platform-k8s-ha-0.0.1.tar.gz`（Helm chart 自包含，需要外部 PG/Redis） |
+| 校验 | 每个 tarball 各自带 `SHA256SUMS`（发布页同目录） |
 
 <p class="ap-lead" style="margin-top:24px">本手册也提供<strong>离线包</strong>：下载解压后 <code>sudo ./install.sh</code>，即可部署到自己的 nginx 上离线阅读，目标机不需要 node、不需要联网 —— 见 <a href="/reference/offline-docs">离线部署本手册</a>。</p>
 

@@ -20,7 +20,8 @@
 | 现象 | 第一手排查 |
 |---|---|
 | `install.sh` 报 `EXTERNAL_IP` 非法 | 必须填真实网卡 IP 或 DNS 名，不接受空值 / `0.0.0.0` / `localhost` / `127.x.x.x` / `::1` |
-| preflight 告警架构不匹配 | 下载与主机架构一致的镜像包；v0.0.1 只发布 amd64 |
+| preflight 告警架构不匹配 | 主机是 `aarch64` / `arm64`，但镜像包是 `amd64`：用 `make package-images-arm64` 重造一份；反过来同理。**v0.0.1 不再随 release 发布镜像包**，架构只对自造镜像包的人有意义。 |
+| 容器起不来 / `docker pull` 卡住 / `quay.io` 超时 | 目标机到 `quay.io` 不通 —— 默认安装必须能访问 `quay.io`。要么打通网络，要么改成气隙安装（先在能上网的机器上 `make package-images-amd64` 造镜像包）。 |
 | preflight 告警磁盘不足 | `/var` 需 ≥ 5 GB 空闲 |
 | `docker compose version` 报错 | 装的是老的 `docker-compose` 独立二进制，需要 compose **插件** |
 | 浏览器完全打不开控制台 | ① 防火墙放行 443 ② `docker compose ps` 看 console 是否 running ③ 确认用的是 `https://` |
