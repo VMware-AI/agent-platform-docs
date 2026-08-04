@@ -10,10 +10,16 @@
 | **一台 Linux 主机** | 已装 Docker + compose 插件，`/var` ≥ 5 GB 空闲，有固定 IP，能访问 `quay.io`（默认安装）。详见[环境要求](/install/requirements) |
 | **一套 vCenter** | 地址 + 账号，账号需要克隆 VM、改 vApp 属性、开关机的权限 |
 | **一个可用的上游模型** | API Base + API Key（内网私有模型服务也行） |
-| **v0.0.1 的安装 tarball** | `agent-platform-dc-standalone-0.0.1.tar.gz`（如果完全离网，再加一个自造镜像包，见下文） |
+| **v0.0.1 的安装 tarball** | [`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz)（如果完全离网，再加一个自造镜像包，见下文） |
 :::
 
 ## 一、装平台（约 3 分钟）
+
+::: tip 下载安装包
+**v0.0.1**：[`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz) — 自包含 tarball，约 1 MB，附 `SHA256SUMS`。
+
+其他形态（`dc-distribution` / `k8s-standalone` / `k8s-ha`）见 [release 页](https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1)。
+:::
 
 ```bash
 mkdir -p /opt/agent-platform && cd /opt/agent-platform

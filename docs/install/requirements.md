@@ -137,14 +137,28 @@ vLLM、SGLang、Xinference、Ollama 等基本都提供 OpenAI 兼容接口，选
 
 ## 交付物清单
 
-从 [release v0.0.1](https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1) 下载对应形态的 tarball（每个 tarball 自带 `SHA256SUMS`）：
+::: tip v0.0.1 安装包
+[`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz) —— 自包含 tarball，自带 `SHA256SUMS`。
 
-| 文件 | 说明 |
-|---|---|
-| `agent-platform-dc-standalone-0.0.1.tar.gz` | docker-compose 单机，自包含：脚本 + compose + 配置 + 文档 |
-| `agent-platform-dc-distribution-0.0.1.tar.gz` | docker-compose 多服务（控制面 + 网关 DB 分离），自包含 |
-| `agent-platform-k8s-standalone-0.0.1.tar.gz` | k8s 小集群（自带 PG/Redis StatefulSet），Helm chart 自包含 |
-| `agent-platform-k8s-ha-0.0.1.tar.gz` | k8s 生产 HA（外部 PG/Redis，≥2 副本），Helm chart 自包含 |
+**v0.0.1 release 暂只发布 `dc-standalone` 这一个**。其他三个形态（`dc-distribution` / `k8s-standalone` / `k8s-ha`）的源码与 `make package-*` target 已在部署仓库就绪，但本 release 暂不出包，需要的话从源码 clone 后自行构建：
+
+```bash
+git clone https://github.com/VMware-AI/agent-platform-deployment.git
+cd agent-platform-deployment
+make package-dc-distribution   # 或 package-k8s-standalone / package-k8s-ha
+```
+
+详见 [release 页](https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1) 与 [部署仓库 README](https://github.com/VMware-AI/agent-platform-deployment/blob/main/README.md)。
+:::
+
+形态对照：
+
+| 形态 | 适用场景 | v0.0.1 是否有官方 tarball |
+|---|---|---|
+| `dc-standalone` | 单机开发 / 评估 / 单机生产 | ✅ 已在 release 发布 |
+| `dc-distribution` | 本地多服务开发（控制面 + 网关 DB 分离） | ⏳ 仓库已就绪，需自行 `make package-dc-distribution` |
+| `k8s-standalone` | k8s 小集群（自带 PG/Redis StatefulSet） | ⏳ 仓库已就绪，需自行 `make package-k8s-standalone` |
+| `k8s-ha` | k8s 生产 HA（外部 PG/Redis，≥2 副本） | ⏳ 仓库已就绪，需自行 `make package-k8s-ha` |
 
 ::: tip 离线镜像包不再随 release 发布
 默认安装由 `install.sh` 从 `quay.io/vmware-ai/*` 拉镜像。**如果目标机无法访问 `quay.io`**，先在能访问的机器上从 `agent-platform-deployment` 仓库跑 `make package-images-amd64`（或 `package-images-arm64`），把产出的 `agent-platform-images-<ver>-amd64.tar.gz` 作为同级目录放到目标机后，`install.sh` 会自动走 `docker load`。

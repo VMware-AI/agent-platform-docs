@@ -10,6 +10,10 @@
 >
 > 完全离网 / 气隙环境按本文 [§6 离线安装（可选：气隙环境）](#6-离线安装可选气隙环境) 走 —— 先在能上网的机器上用 `make package-images-amd64` 造一个镜像包，再带到目标机作为同级目录放好。
 
+::: tip 下载安装包
+**v0.0.1**：[`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz) — 自包含 tarball，约 1 MB，附 `SHA256SUMS`。其他形态见 [release 页](https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1)。
+:::
+
 ## 1. 落盘
 
 ```bash
