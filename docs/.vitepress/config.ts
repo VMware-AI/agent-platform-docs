@@ -45,8 +45,12 @@ export default defineConfig({
         text: `v${PLATFORM_VERSION}`,
         items: [
           // 文档版本选择器 —— 后续多个版本共存时，往这里加。
-          // 当前版本加 (当前) 后缀并指向 /；老版本链到各自的站点或归档。
-          { text: `v${PLATFORM_VERSION}（当前）`, link: '/' },
+          // 最新版本打「最新」标签 + 指向 /；老版本链到各自的站点或归档，
+          // 不再加「最新」。
+          { text: `v${PLATFORM_VERSION}（最新）`, link: '/' },
+          // 示例（未来加老版本时）：
+          // { text: 'v0.0.2', link: '/archive/v0.0.2/' },
+          // { text: 'v0.0.1', link: '/archive/v0.0.1/' },
         ],
       },
     ],
