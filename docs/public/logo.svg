@@ -6,8 +6,14 @@
     </linearGradient>
   </defs>
   <rect x="2" y="2" width="44" height="44" rx="11" fill="url(#ap-g)"/>
-  <circle cx="24" cy="18" r="5.2" fill="#fff"/>
-  <path d="M13 35.5c0-5.8 4.9-9.4 11-9.4s11 3.6 11 9.4" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
-  <circle cx="10.5" cy="24" r="2.6" fill="#fff" opacity=".72"/>
-  <circle cx="37.5" cy="24" r="2.6" fill="#fff" opacity=".72"/>
+  <!-- 控制面 → 受管节点：中心枢纽 + 三条辐条 -->
+  <g stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".85">
+    <path d="M24 24 L24 12.5"/>
+    <path d="M24 24 L13.6 31"/>
+    <path d="M24 24 L34.4 31"/>
+  </g>
+  <circle cx="24" cy="24" r="6.4" fill="#fff"/>
+  <circle cx="24" cy="11.6" r="3.9" fill="#fff"/>
+  <circle cx="12.9" cy="31.6" r="3.9" fill="#fff"/>
+  <circle cx="35.1" cy="31.6" r="3.9" fill="#fff"/>
 </svg>
