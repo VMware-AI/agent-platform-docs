@@ -151,10 +151,7 @@ export default defineConfig({
             { text: '端口与网络', link: '/reference/ports' },
             { text: '离线部署本手册', link: '/reference/offline-docs' },
             { text: '常见问题', link: '/reference/faq' },
-            {
-              text: '发布说明 ↗',
-              link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1',
-            },
+            { text: '发布说明', link: '/reference/releases' },
           ],
         },
       ],
