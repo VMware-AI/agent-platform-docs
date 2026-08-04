@@ -90,4 +90,4 @@
 | 每个仓库单独的完整 CHANGELOG | 各仓库根目录的 `CHANGELOG.md`（console / backend / docs 没有 CHANGELOG.md，变更要点在 release body / commit history 里） |
 | 单个仓库的 commit 时间线 | GitHub 上每个仓库的 `commits/<branch>` 页 |
 | 各仓库的 GitHub Release 列表 | [deployment](https://github.com/VMware-AI/agent-platform-deployment/releases) · [console](https://github.com/VMware-AI/agent-platform-console/releases) · [backend](https://github.com/VMware-AI/agent-platform-backend/releases) |
-| 本仓库镜像 / 离线包 | [GHCR 镜像](https://github.com/VMware-AI/agent-platform-docs/pkgs/container/agent-platform-docs) / 本仓库的 `Actions` 工件 / `make image` 本地构建 |
+| 本仓库镜像 / 离线包 | [quay.io 镜像](https://quay.io/repository/vmware-ai/agent-platform-docs) / 本仓库 `Releases` 里的离线 tarball / `make image` 本地构建 |

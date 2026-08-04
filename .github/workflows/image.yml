@@ -1,12 +1,16 @@
-# 打 tag 时构建并推送 Docker 镜像。
+# 打 tag 时构建并推送 Docker 镜像到 quay.io。
 #
 #   git tag v0.0.2 && git push origin v0.0.2
 #
-# 镜像会推到 GitHub Container Registry（GHCR）：
-#   ghcr.io/<org>/agent-platform-docs:<版本>    —— 内容来自本次构建
-#   ghcr.io/<org>/agent-platform-docs:latest    —— 同上（每个 tag 都同步刷新 latest）
+# 镜像推到 quay.io/vmware-ai/：
+#   quay.io/vmware-ai/agent-platform-docs:<版本>    —— 内容来自本次构建
+#   quay.io/vmware-ai/agent-platform-docs:latest    —— 同上（每个 tag 都同步刷新 latest）
 #
 # 也可以手工触发（workflow_dispatch），只构建不推送。
+#
+# 凭据：通过仓库 secrets 配 QUAY_USERNAME + QUAY_ROBOT_TOKEN
+#   QUAY_USERNAME    —— 推荐用 robot account，命名形如 vmware-ai+ci
+#   QUAY_ROBOT_TOKEN —— robot account 在 quay.io 控制台生成的 token
 #
 # 镜像使用的 base 镜像（在 Dockerfile / Makefile 里声明）：
 #   quay.io/vmware-ai/node:24-alpine   仅为构建期
@@ -21,10 +25,10 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 env:
   IMAGE_NAME: agent-platform-docs
+  IMAGE_REGISTRY: quay.io/vmware-ai
 
 jobs:
   build:
@@ -37,21 +41,19 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"                  # v0.0.2 -> 0.0.2
           [ -z "$VERSION" ] && VERSION="dev"
-          OWNER="${GITHUB_REPOSITORY%/*}"
-          echo "version=${VERSION}"       >> "$GITHUB_OUTPUT"
-          echo "owner=${OWNER,,}"         >> "$GITHUB_OUTPUT"   # 小写
-          echo "tags=${OWNER,,}/${IMAGE_NAME}:${VERSION},${OWNER,,}/${IMAGE_NAME}:latest" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tags=${IMAGE_REGISTRY}/${IMAGE_NAME}:${VERSION},${IMAGE_REGISTRY}/${IMAGE_NAME}:latest" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GHCR
+      - name: Log in to Quay.io
         if: startsWith(github.ref, 'refs/tags/')
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
       - name: Build & push
         uses: docker/build-push-action@v6
