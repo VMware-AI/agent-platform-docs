@@ -46,7 +46,11 @@ jobs:
             dist/*.tar.gz
             dist/*.sha256
           body: |
-            智能体管理平台 · 使用手册离线包。
+            **智能体管理平台 · 官方使用手册** —— 39 页在线手册的离线发布包。
+
+            ## 离线部署到自己的 nginx
+
+            下载下方的 `agent-platform-docs-<版本>.tar.gz`，在目标机上：
 
             ```bash
             tar -xzf agent-platform-docs-<版本>.tar.gz
@@ -54,6 +58,36 @@ jobs:
             sudo ./install.sh
             ```
 
-            默认部署到 `/var/www/agent-platform-docs`，监听 8080。
-            目标机只需要 nginx，不需要 node、不需要联网。
-            详见包内 `README.md`。
+            默认部署到 `/var/www/agent-platform-docs`，监听 **8080**，完成后浏览器打开 `http://<本机IP>:8080/`。
+
+            **目标机只需要 nginx，不需要 node、不需要联网。** 全站含站内搜索均可离线使用，页面运行时不发起任何外部请求。
+
+            常用参数：
+
+            ```bash
+            sudo ./install.sh --port=80                     # 换端口
+            sudo ./install.sh --root=/data/www/docs         # 换站点目录
+            sudo ./install.sh --server-name=docs.corp.lan   # 换域名
+            ./install.sh --dry-run                          # 先看它要做什么，不改任何东西
+            ```
+
+            ## 本地启动（改文档 / 看效果）
+
+            需要 Node.js ≥ 18：
+
+            ```bash
+            git clone https://github.com/VMware-AI/agent-platform-docs.git
+            cd agent-platform-docs
+            npm install
+            npm run dev
+            ```
+
+            浏览器打开 **http://localhost:5173/**，改 markdown 会热更新。
+
+            ## 校验
+
+            ```bash
+            sha256sum -c agent-platform-docs-<版本>.tar.gz.sha256
+            ```
+
+            详见包内 `README.md` 与仓库 README。

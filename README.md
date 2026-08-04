@@ -4,17 +4,44 @@
 
 对应平台版本：**v0.0.1**（`dc-standalone` 形态）。
 
+## 快速开始
+
+**本地启动（改文档、看效果）** —— 需要 Node.js ≥ 18：
+
+```bash
+git clone https://github.com/VMware-AI/agent-platform-docs.git
+cd agent-platform-docs
+npm install
+npm run dev
+```
+
+浏览器打开 **http://localhost:5173/** —— 改 markdown 会热更新，不用重启。
+
+换端口：
+
+```bash
+npm run dev -- --port 4173
+```
+
+**离线部署（内网只读阅读）** —— 目标机只需要 nginx：
+
+```bash
+tar -xzf agent-platform-docs-<版本>.tar.gz
+cd agent-platform-docs-<版本>
+sudo ./install.sh
+```
+
+默认部署到 `/var/www/agent-platform-docs`，监听 **8080**。离线包从 [Releases](https://github.com/VMware-AI/agent-platform-docs/releases) 下载，详见下方[离线发布包](#离线发布包)。
+
 ## 本地开发
 
-```bash
-npm install
-npm run dev        # http://localhost:5173
-```
-
-```bash
-npm run build      # 产物在 docs/.vitepress/dist/
-npm run preview    # 本地预览构建产物
-```
+| 命令 | 作用 |
+|---|---|
+| `npm install` | 装依赖（首次或依赖变更后） |
+| `npm run dev` | 启动开发服务器，热更新，http://localhost:5173/ |
+| `npm run build` | 构建到 `docs/.vitepress/dist/` |
+| `npm run preview` | 本地预览构建产物（验证最终效果） |
+| `./deploy/package.sh` | 打离线发布包到 `dist/` |
 
 > `npm run build` 开启了死链检查（`ignoreDeadLinks: false`），markdown 里指向不存在页面的链接会让构建失败。CI 依赖这一点做链接校验。
 

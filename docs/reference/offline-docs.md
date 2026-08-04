@@ -18,7 +18,25 @@ sha256sum -c agent-platform-docs-<版本>.tar.gz.sha256
 ```
 
 ::: tip 也可以自己出包
-在有网的机器上克隆源码仓，执行 `./deploy/package.sh`，产物在 `dist/`。这适合你改过内容、需要发内部定制版的场景。
+在有网的机器上克隆源码仓，执行 `./deploy/package.sh`，产物在 `dist/`。适合改过内容、需要发内部定制版的场景。
+
+```bash
+git clone https://github.com/VMware-AI/agent-platform-docs.git
+cd agent-platform-docs
+npm install
+./deploy/package.sh          # 产物在 dist/
+```
+:::
+
+::: tip 想先在本地看看 / 改内容
+源码仓自带开发服务器，改 markdown 热更新：
+
+```bash
+npm run dev                  # http://localhost:5173/
+npm run dev -- --port 4173   # 换端口
+```
+
+改完 `npm run build` 会顺带做死链检查，再 `./deploy/package.sh` 出包。
 :::
 
 ## 二、包里有什么
