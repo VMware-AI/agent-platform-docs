@@ -1,0 +1,15 @@
+{
+  "name": "agent-platform-docs",
+  "version": "0.0.1",
+  "private": true,
+  "description": "智能体管理平台 — 官方使用手册（VitePress 静态站点）",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}

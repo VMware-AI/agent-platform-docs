@@ -1,0 +1,310 @@
+/*
+ * 智能体管理平台 — 文档站主题
+ *
+ * 配色取自产品 deck（《VCF 上的私有 AI Agent 平台》）的主题色板：
+ *   accent1 #007B8C（主色）· accent2 #005C8A · accent3 #0098C7 · dk2 #1B1E35
+ * 排版沿用产品介绍页的编辑式风格：大标题、紧字距、细分隔线。
+ */
+
+:root {
+  /* 品牌色阶 */
+  --ap-teal: #007b8c;
+  --ap-teal-deep: #00606e;
+  --ap-teal-soft: #e2f2f4;
+  --ap-cyan: #0098c7;
+  --ap-blue: #005c8a;
+  --ap-navy: #1b1e35;
+  --ap-amber: #b66f14;
+
+  --vp-c-brand-1: var(--ap-teal);
+  --vp-c-brand-2: var(--ap-cyan);
+  --vp-c-brand-3: var(--ap-teal-deep);
+  --vp-c-brand-soft: rgba(0, 123, 140, 0.14);
+
+  --vp-c-tip-1: var(--ap-teal);
+  --vp-c-tip-soft: rgba(0, 123, 140, 0.12);
+
+  --vp-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #007b8c 10%, #0098c7 60%, #61a60e 100%);
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #007b8c55 30%, #0098c755 70%);
+  --vp-home-hero-image-filter: blur(56px);
+}
+
+.dark {
+  --vp-c-brand-1: #3fb8cc;
+  --vp-c-brand-2: #56cbde;
+  --vp-c-brand-3: #2c93a5;
+  --vp-c-bg: #14172a;
+  --vp-c-bg-alt: #101223;
+  --vp-c-bg-elv: #1b1e35;
+}
+
+/* ---------- 排版：编辑式标题 ---------- */
+
+.vp-doc h1 {
+  letter-spacing: -0.035em;
+  font-size: 2.1rem;
+  line-height: 1.2;
+}
+
+.vp-doc h2 {
+  letter-spacing: -0.02em;
+  border-top: 1px solid var(--vp-c-divider);
+  border-bottom: none;
+  padding-top: 26px;
+  margin-top: 46px;
+}
+
+.vp-doc h3 {
+  letter-spacing: -0.01em;
+}
+
+/* 首屏副标题 */
+.VPHero .text {
+  letter-spacing: -0.02em;
+}
+
+.VPHero .tagline {
+  max-width: 640px;
+}
+
+/* ---------- 表格：紧凑、可横向滚动 ---------- */
+
+.vp-doc table {
+  display: table;
+  width: 100%;
+  font-size: 14.5px;
+}
+
+.vp-doc th {
+  background: var(--vp-c-bg-soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vp-doc td,
+.vp-doc th {
+  padding: 9px 14px;
+}
+
+.vp-doc .table-wrapper {
+  overflow-x: auto;
+}
+
+/* ---------- 首页特性卡 ---------- */
+
+.VPFeature {
+  border-color: var(--vp-c-divider);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.VPFeature:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+}
+
+.VPFeature .icon {
+  background: var(--ap-teal-soft);
+  border-radius: 8px;
+}
+
+.dark .VPFeature .icon {
+  background: rgba(63, 184, 204, 0.16);
+}
+
+/* ---------- 首页自定义区块 ---------- */
+
+.ap-section {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 0 24px 8px;
+}
+
+.ap-kicker {
+  color: var(--vp-c-brand-1);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.ap-section h2 {
+  font-size: clamp(24px, 3vw, 34px);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0 0 8px;
+  border: 0;
+  padding: 0;
+}
+
+.ap-lead {
+  color: var(--vp-c-text-2);
+  max-width: 720px;
+  margin-bottom: 28px;
+}
+
+.ap-rule-list {
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.ap-rule-row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.ap-rule-row .num {
+  color: var(--vp-c-brand-1);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-rule-row strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 17px;
+}
+
+.ap-rule-row span {
+  color: var(--vp-c-text-2);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+.ap-rule-row a {
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .ap-rule-row {
+    grid-template-columns: 32px 1fr;
+    gap: 12px;
+  }
+}
+
+/* ---------- 步骤条 ---------- */
+
+.ap-steps {
+  counter-reset: ap-step;
+  padding-left: 0;
+  list-style: none;
+}
+
+.ap-steps > li {
+  counter-increment: ap-step;
+  position: relative;
+  padding-left: 40px;
+  margin: 0 0 20px;
+  border-left: 1px solid var(--vp-c-divider);
+  padding-bottom: 4px;
+}
+
+.ap-steps > li::before {
+  content: counter(ap-step);
+  position: absolute;
+  left: -13px;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ---------- 分层架构图 ---------- */
+
+.ap-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 28px 0 32px;
+}
+
+.ap-layer {
+  border: 1px solid var(--vp-c-divider);
+  border-left: 4px solid var(--vp-c-brand-1);
+  border-radius: 10px;
+  padding: 14px 18px;
+  background: var(--vp-c-bg-soft);
+}
+
+.ap-layer-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.ap-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ap-chips span {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.ap-layer-user {
+  border-left-color: #61a60e;
+}
+.ap-layer-ctrl {
+  border-left-color: var(--ap-teal);
+}
+.ap-layer-data {
+  border-left-color: var(--ap-cyan);
+}
+.ap-layer-run {
+  border-left-color: var(--ap-blue);
+}
+.ap-layer-infra {
+  border-left-color: var(--ap-navy);
+}
+.dark .ap-layer-infra {
+  border-left-color: #6f7699;
+}
+
+/* ---------- 徽标 ---------- */
+
+.ap-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  vertical-align: middle;
+}
+
+.ap-badge.admin {
+  background: rgba(0, 123, 140, 0.14);
+  color: var(--ap-teal-deep);
+}
+
+.ap-badge.readonly {
+  background: rgba(0, 152, 199, 0.14);
+  color: var(--ap-blue);
+}
+
+.dark .ap-badge.admin,
+.dark .ap-badge.readonly {
+  color: #7fd6e4;
+}
