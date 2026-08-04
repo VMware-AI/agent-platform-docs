@@ -146,6 +146,7 @@ export default defineConfig({
             { text: '角色与权限矩阵', link: '/reference/roles' },
             { text: '环境变量', link: '/reference/env' },
             { text: '端口与网络', link: '/reference/ports' },
+            { text: '离线部署本手册', link: '/reference/offline-docs' },
             { text: '常见问题', link: '/reference/faq' },
           ],
         },

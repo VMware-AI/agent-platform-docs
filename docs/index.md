@@ -92,4 +92,6 @@ features:
 | 校验 | `SHA256SUMS`（发布页同目录） |
 | 其他形态 | `dc-distribution` / `k8s-standalone` / `k8s-ha` 脚手架已就绪，本次不发布 |
 
+<p class="ap-lead" style="margin-top:24px">本手册也提供<strong>离线包</strong>：下载解压后 <code>sudo ./install.sh</code>，即可部署到自己的 nginx 上离线阅读，目标机不需要 node、不需要联网 —— 见 <a href="/reference/offline-docs">离线部署本手册</a>。</p>
+
 </div>

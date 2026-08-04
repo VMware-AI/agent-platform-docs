@@ -37,6 +37,30 @@ docs/
 └── reference/                   # 参考：角色权限 · 环境变量 · 端口 · FAQ
 ```
 
+## 离线发布包
+
+给内网 / 气隙环境用的自包含 tarball：
+
+```bash
+./deploy/package.sh              # 版本号取 package.json
+./deploy/package.sh 0.0.2        # 手工指定
+```
+
+产物 `dist/agent-platform-docs-<版本>.tar.gz`（约 1 MB）+ `.sha256`。包内是 `site/` + `nginx.conf` + `install.sh` + 离线部署说明，目标机**只需要 nginx**：
+
+```bash
+tar -xzf agent-platform-docs-<版本>.tar.gz
+cd agent-platform-docs-<版本>
+sudo ./install.sh                 # 默认 /var/www/agent-platform-docs，端口 8080
+./install.sh --dry-run            # 先看它要做什么
+```
+
+打 tag 推上去会由 `.github/workflows/release.yml` 自动出包并挂到 GitHub Release：
+
+```bash
+git tag v0.0.1 && git push origin v0.0.1
+```
+
 ## 部署到 nginx
 
 ### 方式一：脚本一键发布

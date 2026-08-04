@@ -1,0 +1,59 @@
+# 打 tag 时出离线发布包，并挂到 GitHub Release 上。
+#
+#   git tag v0.0.1 && git push origin v0.0.1
+#
+# 也可以在 Actions 里手工触发（workflow_dispatch），只产出制品、不建 release。
+
+name: Release offline bundle
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Package
+        run: ./deploy/package.sh
+
+      - name: List artifacts
+        run: ls -lh dist/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: offline-bundle
+          path: |
+            dist/*.tar.gz
+            dist/*.sha256
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.sha256
+          body: |
+            智能体管理平台 · 使用手册离线包。
+
+            ```bash
+            tar -xzf agent-platform-docs-<版本>.tar.gz
+            cd agent-platform-docs-<版本>
+            sudo ./install.sh
+            ```
+
+            默认部署到 `/var/www/agent-platform-docs`，监听 8080。
+            目标机只需要 nginx，不需要 node、不需要联网。
+            详见包内 `README.md`。
