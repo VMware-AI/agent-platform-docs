@@ -40,7 +40,7 @@ export default defineConfig({
       { text: '控制台', link: '/console/overview', activeMatch: '/console/' },
       { text: '可观测性', link: '/observability/metering', activeMatch: '/observability/' },
       { text: '智能体 VM', link: '/agent-vm/access', activeMatch: '/agent-vm/' },
-      { text: '参考', link: '/reference/roles', activeMatch: '/reference/' },
+      { text: '参考', link: '/reference/runbook', activeMatch: '/reference/' },
       {
         text: `v${PLATFORM_VERSION}`,
         items: [
@@ -114,6 +114,7 @@ export default defineConfig({
             { text: '部署智能体', link: '/console/deploy' },
             { text: '智能体实例', link: '/console/agents' },
             { text: '技能管理', link: '/console/skills' },
+            { text: '配置与知识包', link: '/console/agent-config' },
           ],
         },
       ],
@@ -143,7 +144,10 @@ export default defineConfig({
         {
           text: '参考',
           items: [
+            { text: '日常运维手册', link: '/reference/runbook' },
+            { text: '安全基线', link: '/reference/security' },
             { text: '角色与权限矩阵', link: '/reference/roles' },
+            { text: '规格与限制', link: '/reference/limits' },
             { text: '环境变量', link: '/reference/env' },
             { text: '端口与网络', link: '/reference/ports' },
             { text: '离线部署本手册', link: '/reference/offline-docs' },

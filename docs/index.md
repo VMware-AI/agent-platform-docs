@@ -55,7 +55,7 @@ features:
 <div class="num">01</div>
 <div>
 <strong>平台运维 / 部署工程师</strong>
-<span>在一台 Linux 主机上离线拉起整套平台：<a href="/install/requirements">环境要求</a> → <a href="/install/dc-standalone">离线安装</a> → <a href="/install/first-login">首次登录</a> → <a href="/install/verify">健康检查</a>。日常运维看 <a href="/install/upgrade">升级与卸载</a>、<a href="/install/troubleshooting">故障排查</a>。</span>
+<span>在一台 Linux 主机上离线拉起整套平台：<a href="/install/requirements">环境要求</a> → <a href="/install/dc-standalone">离线安装</a> → <a href="/install/first-login">首次登录</a> → <a href="/install/verify">健康检查</a>。装完照 <a href="/reference/security">安全基线</a> 过一遍，日常按 <a href="/reference/runbook">日常运维手册</a> 走。</span>
 </div>
 </div>
 
