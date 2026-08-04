@@ -104,7 +104,7 @@ deploy/
 
 ```bash
 ./deploy/package.sh              # 版本号取 package.json
-./deploy/package.sh 0.0.2        # 手工指定
+./deploy/package.sh 0.0.1        # 手工指定
 ```
 
 产物 `dist/agent-platform-docs-<版本>.tar.gz`（约 1 MB）+ `.sha256`。包内是 `site/` + `nginx.conf` + `install.sh` + 离线部署说明，目标机**只需要 nginx**：
@@ -202,18 +202,18 @@ make image-run
 docker run -d --name agent-platform-docs \
   -p 8080:80 \
   --restart unless-stopped \
-  quay.io/vmware-ai/agent-platform-docs:0.0.2
+  quay.io/vmware-ai/agent-platform-docs:0.0.1
 
 # 端口被占了？换成 :9090
 docker run -d --name agent-platform-docs -p 9090:80 --restart unless-stopped \
-  quay.io/vmware-ai/agent-platform-docs:0.0.2
+  quay.io/vmware-ai/agent-platform-docs:0.0.1
 
 # 跟挂了几台宿主机需要让外部一致：再绑一个主机名
 docker run -d --name agent-platform-docs \
   -p 8080:80 \
   -h docs.example.com \
   --restart unless-stopped \
-  quay.io/vmware-ai/agent-platform-docs:0.0.2
+  quay.io/vmware-ai/agent-platform-docs:0.0.1
 ```
 
 日常运维：
@@ -223,10 +223,10 @@ docker run -d --name agent-platform-docs \
 docker logs -f agent-platform-docs
 
 # 升级到新版本：先 pull → 停旧 → 启新
-docker pull quay.io/vmware-ai/agent-platform-docs:0.0.3
+docker pull quay.io/vmware-ai/agent-platform-docs:0.0.2
 docker stop agent-platform-docs && docker rm agent-platform-docs
 docker run -d --name agent-platform-docs -p 8080:80 --restart unless-stopped \
-  quay.io/vmware-ai/agent-platform-docs:0.0.3
+  quay.io/vmware-ai/agent-platform-docs:0.0.2
 
 # 临时停掉（保留容器）/ 完全清理
 docker stop agent-platform-docs
@@ -264,7 +264,7 @@ Makefile 把所有可调点都做成了变量，可在命令行覆盖：
 
 ```bash
 make image NODE_IMAGE=quay.io/vmware-ai/node:24-alpine NGINX_IMAGE=quay.io/vmware-ai/nginx:1.31.2 TAG=dev
-make release-images REGISTRY=quay.io/myorg/ TAG=v0.0.3
+make release-images REGISTRY=quay.io/myorg/ TAG=v0.0.2
 make release-images PLATFORMS=linux/amd64       # 只出 amd64（比如先验证某个 release）
 ```
 
