@@ -44,14 +44,9 @@ export default defineConfig({
       {
         text: `v${PLATFORM_VERSION}`,
         items: [
-          {
-            text: '下载安装包',
-            link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz',
-          },
-          {
-            text: '发布说明',
-            link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1',
-          },
+          // 文档版本选择器 —— 后续多个版本共存时，往这里加。
+          // 当前版本加 (当前) 后缀并指向 /；老版本链到各自的站点或归档。
+          { text: `v${PLATFORM_VERSION}（当前）`, link: '/' },
         ],
       },
     ],
@@ -79,6 +74,10 @@ export default defineConfig({
             { text: '健康检查', link: '/install/verify' },
             { text: '升级与卸载', link: '/install/upgrade' },
             { text: '故障排查', link: '/install/troubleshooting' },
+            {
+              text: '下载安装包 ↗',
+              link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz',
+            },
           ],
         },
       ],
@@ -152,6 +151,10 @@ export default defineConfig({
             { text: '端口与网络', link: '/reference/ports' },
             { text: '离线部署本手册', link: '/reference/offline-docs' },
             { text: '常见问题', link: '/reference/faq' },
+            {
+              text: '发布说明 ↗',
+              link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1',
+            },
           ],
         },
       ],
