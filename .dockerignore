@@ -1,0 +1,22 @@
+# docker build 上下文过滤 —— 只保留构建和镜像需要的文件
+
+# 构建产物 —— 不要把上次构建结果塞进下一次构建上下文
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# 离线发布包（手动物理包不应混进镜像层）
+dist/
+
+# 大件忽略
+node_modules/
+*.log
+.DS_Store
+
+# 自身 git 元数据没意义
+.git/
+.gitignore
+
+# CI / IDE
+.github/
+.idea/
+.vscode/
