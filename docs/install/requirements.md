@@ -137,7 +137,7 @@ vLLM、SGLang、Xinference、Ollama 等基本都提供 OpenAI 兼容接口，选
 
 ## 交付物清单
 
-从 [release v0.0.1](https://github.com/VMware-AI/agent-platform-deployment/releases/tag/release-v0.0.1) 下载对应形态的 tarball（每个 tarball 自带 `SHA256SUMS`）：
+从 [release v0.0.1](https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1) 下载对应形态的 tarball（每个 tarball 自带 `SHA256SUMS`）：
 
 | 文件 | 说明 |
 |---|---|

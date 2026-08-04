@@ -46,11 +46,11 @@ export default defineConfig({
         items: [
           {
             text: '下载安装包',
-            link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/download/release-v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz',
+            link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz',
           },
           {
             text: '发布说明',
-            link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/tag/release-v0.0.1',
+            link: 'https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1',
           },
         ],
       },

@@ -163,6 +163,36 @@ ls -lh dist/
 
 输出包含 `manifest.yaml` + `images/images.tar.gz` + `images/SHA256SUMS`，与镜像的源清单 [`origin-images-list.txt`](https://github.com/VMware-AI/agent-platform-deployment/blob/main/origin-images-list.txt) 对得上。**升级时 bump 这两个清单再重新打包**。
 
+不想 / 不能用 Makefile 时，按同样的清单手搓一个：
+
+```bash
+# 在能访问 quay.io 的机器上
+case "$(uname -m)" in
+  x86_64)  IMG_ARCH=linux/amd64 ;;
+  aarch64|arm64) IMG_ARCH=linux/arm64 ;;
+  *) echo "unknown arch" >&2; exit 1 ;;
+esac
+
+# 逐行拉、按架构；空行与 # 起头的注释自动跳过
+while read -r img; do
+  [[ -z "$img" || "$img" == \#* ]] && continue
+  docker pull --platform="${IMG_ARCH}" "$img"
+done < origin-images-list.txt
+
+# 一次性 save 成单个 tar.gz
+mkdir -p images && cd images
+docker save --platform="${IMG_ARCH}" \
+  -o images.tar $(grep -v '^#' ../origin-images-list.txt | grep -v '^$')
+gzip images.tar
+sha256sum images.tar.gz > SHA256SUMS
+
+# 打包成 install.sh 同款目录结构
+cd .. && tar -czf agent-platform-images-<ver>-${IMG_ARCH#linux/}.tar.gz \
+  manifest.yaml images/images.tar.gz images/SHA256SUMS
+```
+
+产物布局跟 Makefile 出的完全一致：`manifest.yaml` + `images/images.tar.gz` + `images/SHA256SUMS`，`install.sh` 不用任何修改就能识别。
+
 ### 步骤 2：把两个 tarball 一起搬到目标机
 
 ```bash

@@ -17,7 +17,7 @@ hero:
       link: /guide/introduction
     - theme: alt
       text: 下载 v0.0.1 安装包
-      link: https://github.com/VMware-AI/agent-platform-deployment/releases/tag/release-v0.0.1
+      link: https://github.com/VMware-AI/agent-platform-deployment/releases/tag/v0.0.1
 
 features:
   - icon: 🚀
@@ -89,7 +89,7 @@ features:
 
 | 内容 | 说明 |
 |---|---|
-| 安装包 · dc-standalone | [`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/release-v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz) |
+| 安装包 · dc-standalone | [`agent-platform-dc-standalone-0.0.1.tar.gz`](https://github.com/VMware-AI/agent-platform-deployment/releases/download/v0.0.1/agent-platform-dc-standalone-0.0.1.tar.gz) |
 | 安装包 · dc-distribution | `agent-platform-dc-distribution-0.0.1.tar.gz` |
 | 安装包 · k8s-standalone | `agent-platform-k8s-standalone-0.0.1.tar.gz`（Helm chart 自包含） |
 | 安装包 · k8s-ha | `agent-platform-k8s-ha-0.0.1.tar.gz`（Helm chart 自包含，需要外部 PG/Redis） |
