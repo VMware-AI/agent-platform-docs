@@ -2,7 +2,13 @@
 
 **智能体管理平台**的官方使用手册 —— 基于 [VitePress](https://vitepress.dev) 的静态文档站，构建产物是纯静态文件，直接扔给 nginx 托管即可。
 
-对应平台版本：**v0.0.1**（`dc-standalone` 形态）。
+对应平台版本：**v0.0.1**（`dc-standalone` 形态）。变更记录见 [CHANGELOG.md](CHANGELOG.md)。
+
+> **两个版本号别混**
+> - **文档站版本**（`package.json` / 离线包文件名）—— 这套站点自身的迭代版本
+> - **平台版本**（站点导航右上角的 `v0.0.1`，配置在 `docs/.vitepress/config.ts` 的 `PLATFORM_VERSION`）—— 手册所描述的 agent-platform 版本
+>
+> 平台没发新版时，手册也可能因为补充内容而发新版。
 
 ## 快速开始
 
